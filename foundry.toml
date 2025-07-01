@@ -4,10 +4,12 @@ out = "out"
 libs = ["lib"]
 
 remappings = [
-  "openzeppelin-contracts/=lib/openzeppelin-contracts/",
+  # OpenZeppelin non-upgradeable
+  "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/",
+  # OpenZeppelin upgradeable (IERC, ERC721EnumerableUpgradeable, AccessControlUpgradeable, Proxy, UUPS…)
   "openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
+  # Chainlink VRF, oracles…
   "chainlink/=lib/chainlink/",
+  # Forge-std pour Test.sol, Script.sol…
   "forge-std/=lib/forge-std/src/"
 ]
-
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
