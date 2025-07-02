@@ -11,5 +11,7 @@ remappings = [
   # Chainlink VRF, oracles…
   "chainlink/=lib/chainlink/",
   # Forge-std pour Test.sol, Script.sol…
-  "forge-std/=lib/forge-std/src/"
+  "forge-std/=lib/forge-std/src/",
+
+  "openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/"
 ]

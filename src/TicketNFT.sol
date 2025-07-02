@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "openzeppelin-contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "openzeppelin-contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
  * @title TicketNFT
@@ -83,7 +83,7 @@ contract TicketNFT is ERC721EnumerableUpgradeable, AccessControlUpgradeable, UUP
      * @return Base URI string
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        _requireOwned(tokenId);
+        require(_exists(tokenId), "ERC721: invalid token ID");
 
         string memory baseURI = _baseURI();
         return bytes(baseURI).length > 0 ? string.concat(baseURI, ticketMetadataUri[tokenId]) : "";
