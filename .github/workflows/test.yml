@@ -1,45 +1,79 @@
 name: CI
 
+# Trigger workflow on push, pull requests and manual dispatches
 on:
   push:
   pull_request:
   workflow_dispatch:
 
 env:
-  FOUNDRY_PROFILE: ci
+  FOUNDRY_PROFILE: ci # Use the 'ci' Foundry profile for reproducible builds
 
 jobs:
   check:
-    strategy:
-      fail-fast: true
+    # Optional: Enable a matrix if you want to test multiple versions or OSes
+    # strategy:
+    #   matrix:
+    #     os: [ubuntu-latest]
+    #     foundry-version: [nightly]
+    #   fail-fast: true
 
     name: Foundry project
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout repository, including submodules
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
+      # Cache Foundry's build artifacts and dependencies for faster builds (optional)
+      - name: Cache Foundry artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/.foundry
+            ~/.foundry
+          key: ${{ runner.os }}-foundry-${{ hashFiles('**/foundry.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-foundry-
+
+      # Install Foundry toolchain (pin to a version if possible for reproducibility)
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
+          version: nightly # Consider pinning to a specific nightly for consistency
 
+      # Show the installed Forge version
       - name: Show Forge version
-        run: |
-          forge --version
+        run: forge --version
 
+      # Run Forge formatter check. Don't fail the build immediately if formatting is wrong.
       - name: Run Forge fmt
-        run: |
-          forge fmt --check
+        run: forge fmt --check
         id: fmt
+        continue-on-error: true # Allows you to see formatting errors without failing the whole job
 
+      # Build the project and show contract sizes
       - name: Run Forge build
-        run: |
-          forge build --sizes
+        run: forge build --sizes
         id: build
 
+      # Run all tests with verbose output
       - name: Run Forge tests
-        run: |
-          forge test -vvv
+        run: forge test -vvv
         id: test
+
+      # (Optional) Upload test results or build artifacts, if needed
+      # - name: Upload Forge test results
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: forge-test-results
+      #     path: path/to/results
+
+      # (Optional) Fail the workflow if formatting is wrong, but only after other steps
+      - name: Fail if formatting is incorrect
+        if: steps.fmt.outcome == 'failure'
+        run: |
+          echo "Code is not formatted! Please run 'forge fmt'."
+          exit 1
